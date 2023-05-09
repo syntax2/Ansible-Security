@@ -1,0 +1,12 @@
+---
+- name: Update Ubuntu with latest security patches
+  hosts: all
+  become: true
+  
+  tasks:
+  - name: Update Ubuntu
+    apt:
+      update_cache: yes
+      upgrade: yes
+      autoremove: yes
+
