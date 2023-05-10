@@ -1,4 +1,4 @@
-- name: Update Ubuntu with latest security patches
+- name: Update Ubuntu with latest security patches and configure firewall rules
   hosts: all
   become: true
 
@@ -58,4 +58,50 @@
       direction: outgoing
       policy: allow
 
+- name: Set kernel tuning parameters
+  hosts: all
+  become: true
+
+  tasks:
+  - name: Set IP forwarding to disabled
+    sysctl:
+      name: net.ipv4.ip_forward
+      value: 0
+      state: present
+
+  - name: Disable ICMP redirects
+    sysctl:
+      name: net.ipv4.conf.all.accept_redirects
+      value: 0
+      state: present
+
+  - name: Disable packet redirect sending
+    sysctl:
+      name: net.ipv4.conf.all.send_redirects
+      value: 0
+      state: present
+
+  - name: Disable source routed packets
+    sysctl:
+      name: net.ipv4.conf.all.accept_source_route
+      value: 0
+      state: present
+
+  - name: Enable TCP SYN Cookies
+    sysctl:
+      name: net.ipv4.tcp_syncookies
+      value: 1
+      state: present
+
+  - name: Ignore Broadcast Requests
+    sysctl:
+      name: net.ipv4.icmp_echo_ignore_broadcasts
+      value: 1
+      state: present
+
+  - name: Enable Bad Error Message Protection
+    sysctl:
+      name: net.ipv4.icmp_ignore_bogus_error_responses
+      value: 1
+      state: present
 
