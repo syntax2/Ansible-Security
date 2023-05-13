@@ -1,0 +1,14 @@
+- name: Check for world-writable files
+  hosts: all
+  become: true
+  tasks:
+  - name: Find writable files
+    shell: find / -xdev -type f -perm -0002 -ls
+    register: writable_files
+    ignore_errors: true
+  
+  - name: Fail if world-writable files exist
+    fail:
+      msg: "World-writable files found: {{ writable_files.stdout_lines }}"
+    when: writable_files.stdout_lines | length > 0
+
