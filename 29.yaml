@@ -1,11 +1,18 @@
-- name: Ensure HTTP Trace method is disabled for nginx
+- name: Disable HTTP Trace method for Nginx
   hosts: all
   become: true
 
   tasks:
-    - name: Disable HTTP Trace method in nginx.conf
-      lineinfile:
-        path: /etc/nginx/nginx.conf
-        regexp: "^\\s*add_header\\s+X-Content-Type-Options"
-        line: "add_header X-Content-Type-Options nosniff;\n\tadd_header X-XSS-Protection \"1; mode=block\";\n\tadd_header X-Frame-Options DENY;\n\tadd_header Referrer-Policy same-origin;\n\tif ($request_method = 'TRACE') { return 405; }\n\t"
+    - name: Set nginx HTTP Trace method to off
+      nginx_http_module:
+        name: "http"
+        parameter: "trace_method off"
+      notify:
+        - Restart Nginx service
+
+  handlers:
+    - name: Restart Nginx service
+      service:
+        name: nginx
+        state: restarted
 
